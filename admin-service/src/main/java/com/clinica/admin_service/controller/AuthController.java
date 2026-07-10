@@ -65,7 +65,7 @@ public class AuthController {
         String token = jwtUtil.generateToken(usuario.getEmail(), roleWithPrefix);
         logger.info("Token generado exitosamente, longitud: " + token.length());
         
-        return ResponseEntity.ok(Map.of("token", token, "role", usuario.getRol().name()));
+        return ResponseEntity.ok(Map.of("token", token, "role", usuario.getRol().name(), "nombre", usuario.getNombre()));
     }
 
     @PostMapping("/register-admin")
