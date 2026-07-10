@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Portal Paciente | Red Norte Salud</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/pacientes/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#inicio">
+                <span class="brand-mark d-grid place-items-center bg-teal text-white rounded-2 fw-bold" aria-hidden="true">+</span>
+                <span>
+                    <strong class="d-block">Red Norte Salud</strong>
+                    <small class="d-block text-muted small">Portal paciente</small>
+                </span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Abrir menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainMenu">
+                <ul class="navbar-nav ms-auto gap-1">
+                    <li class="nav-item"><a class="nav-link fw-bold px-3" href="#estado">Mi estado</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold px-3" href="#servicios">Servicios</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold px-3" href="#red">Red asistencial</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold px-3" href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main id="inicio">
+        <section class="hero-section">
+            <div class="container-fluid">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-7 px-4 px-lg-5">
+                        <p class="eyebrow text-teal text-uppercase fw-bold small mb-2">Atencion coordinada en hospitales, APS y clinicas especializadas</p>
+                        <h1 class="display-3 fw-bold mb-3">Consulta tu avance y encuentra apoyo de salud sin iniciar sesion.</h1>
+                        <p class="lead text-secondary mb-4">
+                            Revisa el estado actual de tus solicitudes, orientacion de atencion y servicios disponibles en la red.
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-teal btn-lg px-4" href="#estado">Ver mi estado</a>
+                            <a class="btn btn-outline-secondary btn-lg px-4" href="#servicios">Explorar servicios</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 px-4 px-lg-5">
+                        <div class="hero-visual p-4 border rounded-3 bg-white shadow">
+                            <div class="network-card hospital border-start border-4 border-primary bg-white p-3 rounded-3 mb-3 shadow-sm">
+                                <span class="text-muted text-uppercase small fw-bold">Hospital</span>
+                                <strong class="d-block mt-1">Urgencia y alta complejidad</strong>
+                            </div>
+                            <div class="network-card primary border-start border-4 border-success bg-white p-3 rounded-3 mb-3 shadow-sm ms-auto" style="max-width: 90%;">
+                                <span class="text-muted text-uppercase small fw-bold">APS</span>
+                                <strong class="d-block mt-1">Control y seguimiento</strong>
+                            </div>
+                            <div class="network-card clinic border-start border-4 border-warning bg-white p-3 rounded-3 shadow-sm mx-auto" style="max-width: 85%;">
+                                <span class="text-muted text-uppercase small fw-bold">Clinica</span>
+                                <strong class="d-block mt-1">Especialidades y examenes</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="estado" class="py-5">
+            <div class="container-fluid">
+                <div class="row mb-4">
+                    <div class="col-lg-8 px-4 px-lg-5">
+                        <p class="eyebrow text-teal text-uppercase fw-bold small mb-2">Seguimiento paciente</p>
+                        <h2 class="fw-bold mb-2">Estado actual de tus solicitudes</h2>
+                        <p class="text-muted">Ingresa el codigo entregado por el centro de salud para consultar el progreso de una solicitud.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-8 px-4 px-lg-5">
+                        <form class="code-lookup p-3 border rounded-3 bg-white shadow-sm" aria-label="Consulta de solicitud por codigo">
+                            <label for="tracking-code" class="form-label fw-bold">Codigo de solicitud</label>
+                            <div class="input-group">
+                                <input id="tracking-code" name="tracking-code" type="text" class="form-control form-control-lg text-uppercase" placeholder="Ej: RN-4821" autocomplete="off">
+                                <button class="btn btn-teal px-4" type="submit">Consultar</button>
+                            </div>
+                            <p class="lookup-message text-muted small mt-2 mb-0" role="status" aria-live="polite">Puedes probar con RN-4821, RN-3057 o RN-9184.</p>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-auto px-4 px-lg-5">
+                        <div class="d-inline-flex align-items-center gap-2 px-3 py-2 border rounded-3 bg-light">
+                            <span class="text-muted text-uppercase small fw-bold">Codigo consultado</span>
+                            <strong class="current-code text-teal">RN-4821</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 px-4 px-lg-5">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <p class="eyebrow text-teal text-uppercase fw-bold small mb-1">Solicitud destacada</p>
+                                        <h3 id="progress-title" class="fw-bold mb-0">Hora a medico especialista</h3>
+                                    </div>
+                                    <span class="status-pill badge rounded-pill bg-success-subtle text-success-emphasis fw-bold">En preparacion</span>
+                                </div>
+
+                                <div class="progress mb-4" style="height: 14px;" aria-label="Progreso de hora medica">
+                                    <div class="progress-bar bg-teal progress-fill" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+
+                                <ol class="steps list-unstyled mb-0">
+                                    <li class="done d-flex gap-3 mb-3">
+                                        <span class="step-indicator bg-teal border border-3 border-teal rounded-circle flex-shrink-0"></span>
+                                        <div>
+                                            <strong class="d-block">Solicitud recibida</strong>
+                                            <small class="text-muted">Datos registrados por la red.</small>
+                                        </div>
+                                    </li>
+                                    <li class="done d-flex gap-3 mb-3">
+                                        <span class="step-indicator bg-teal border border-3 border-teal rounded-circle flex-shrink-0"></span>
+                                        <div>
+                                            <strong class="d-block">Priorizacion clinica</strong>
+                                            <small class="text-muted">Equipo reviso antecedentes.</small>
+                                        </div>
+                                    </li>
+                                    <li class="active d-flex gap-3 mb-3">
+                                        <span class="step-indicator bg-teal border border-3 border-teal rounded-circle flex-shrink-0"></span>
+                                        <div>
+                                            <strong class="d-block">Asignacion de cupo</strong>
+                                            <small class="text-muted">Buscando disponibilidad en la red.</small>
+                                        </div>
+                                    </li>
+                                    <li class="d-flex gap-3">
+                                        <span class="step-indicator border border-3 border-secondary-subtle rounded-circle flex-shrink-0 bg-white"></span>
+                                        <div>
+                                            <strong class="d-block">Confirmacion</strong>
+                                            <small class="text-muted">Recibiras fecha, hora y recinto.</small>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-3">
+                                <h3 class="fw-bold mb-3 px-2">Solicitudes de ejemplo</h3>
+                                <div class="d-grid gap-2">
+                                    <button class="wait-item selected btn btn-outline-secondary text-start p-3 d-flex justify-content-between align-items-center" type="button" data-code="RN-4821" data-progress="68" data-title="Hora a medico especialista" data-state="En preparacion">
+                                        <span>Medico especialista</span>
+                                        <strong class="text-teal">68%</strong>
+                                    </button>
+                                    <button class="wait-item btn btn-outline-secondary text-start p-3 d-flex justify-content-between align-items-center" type="button" data-code="RN-3057" data-progress="42" data-title="Hora a examenes" data-state="Revision pendiente">
+                                        <span>Examenes</span>
+                                        <strong class="text-teal">42%</strong>
+                                    </button>
+                                    <button class="wait-item btn btn-outline-secondary text-start p-3 d-flex justify-content-between align-items-center" type="button" data-code="RN-9184" data-progress="25" data-title="Interconsulta" data-state="Solicitud recibida">
+                                        <span>Interconsulta</span>
+                                        <strong class="text-teal">25%</strong>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="servicios" class="py-5 bg-light">
+            <div class="container-fluid">
+                <div class="row mb-4">
+                    <div class="col-lg-8 px-4 px-lg-5">
+                        <p class="eyebrow text-teal text-uppercase fw-bold small mb-2">Que ofrece la red</p>
+                        <h2 class="fw-bold mb-2">Servicios disponibles para pacientes y familias</h2>
+                    </div>
+                </div>
+                <div class="row g-3 px-4 px-lg-5">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <span class="service-icon d-grid place-items-center bg-primary text-white rounded-2 fw-bold mb-3" style="width: 42px; height: 42px;">H</span>
+                                <h3 class="fw-bold">Hospitales</h3>
+                                <p class="text-muted mb-0">Atencion de urgencia, hospitalizacion, pabellones, derivaciones y unidades de mayor complejidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <span class="service-icon d-grid place-items-center bg-success text-white rounded-2 fw-bold mb-3" style="width: 42px; height: 42px;">A</span>
+                                <h3 class="fw-bold">Centros de atencion primaria</h3>
+                                <p class="text-muted mb-0">Controles preventivos, vacunacion, programas cronicos, salud familiar y seguimiento territorial.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <span class="service-icon d-grid place-items-center bg-info text-white rounded-2 fw-bold mb-3" style="width: 42px; height: 42px;">E</span>
+                                <h3 class="fw-bold">Clinicas especializadas</h3>
+                                <p class="text-muted mb-0">Consultas de especialidad, procedimientos ambulatorios, imagenologia y examenes de apoyo.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <span class="service-icon d-grid place-items-center bg-warning text-white rounded-2 fw-bold mb-3" style="width: 42px; height: 42px;">O</span>
+                                <h3 class="fw-bold">Orientacion al paciente</h3>
+                                <p class="text-muted mb-0">Informacion sobre requisitos, preparacion para examenes, ubicaciones y canales de contacto.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="red" class="py-5 bg-teal-subtle">
+            <div class="container-fluid">
+                <div class="row g-4 align-items-start px-4 px-lg-5">
+                    <div class="col-lg-7">
+                        <p class="eyebrow text-teal text-uppercase fw-bold small mb-2">Red integrada</p>
+                        <h2 class="fw-bold mb-3">Una ruta de atencion conectada</h2>
+                        <p class="text-muted mb-0">
+                            La red coordina prestadores para que cada paciente sea derivado al nivel de atencion que corresponde:
+                            APS para seguimiento, hospitales para casos complejos y clinicas especializadas para diagnostico o tratamiento.
+                        </p>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item py-3 px-4 border-bottom">
+                                    <strong class="d-block display-6 text-teal fw-bold">24/7</strong>
+                                    <span class="text-muted">Orientacion y urgencias segun disponibilidad local.</span>
+                                </li>
+                                <li class="list-group-item py-3 px-4 border-bottom">
+                                    <strong class="d-block display-6 text-teal fw-bold">3 niveles</strong>
+                                    <span class="text-muted">Primaria, hospitalaria y especializada.</span>
+                                </li>
+                                <li class="list-group-item py-3 px-4">
+                                    <strong class="d-block display-6 text-teal fw-bold">Seguimiento</strong>
+                                    <span class="text-muted">Estados visibles para solicitudes relevantes.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contacto" class="py-4 bg-dark text-white">
+        <div class="container-fluid">
+            <div class="row g-4 px-4 px-lg-5">
+                <div class="col-lg-5">
+                    <strong class="d-block mb-2">Red Norte Salud</strong>
+                    <p class="text-white-50 mb-0">Administracion de hospitales, centros de atencion primaria y clinicas especializadas.</p>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <span class="d-block text-white-50 small text-uppercase fw-bold mb-2">Mesa de ayuda</span>
+                    <a class="d-block text-white-50 text-decoration-none mb-1" href="tel:+56000000000">+56 00 0000 0000</a>
+                    <a class="d-block text-white-50 text-decoration-none" href="mailto:contacto@rednortesalud.cl">contacto@rednortesalud.cl</a>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <span class="d-block text-white-50 small text-uppercase fw-bold mb-2">Accesos</span>
+                    <a class="d-block text-white-50 text-decoration-none mb-1" href="#estado">Estado de solicitudes</a>
+                    <a class="d-block text-white-50 text-decoration-none" href="#servicios">Servicios de salud</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/pacientes/app.js"></script>
+</body>
+</html>

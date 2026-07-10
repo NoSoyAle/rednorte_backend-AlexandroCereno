@@ -1,0 +1,159 @@
+services:
+  mysql-admin:
+    image: mysql:8.0
+    container_name: mysql-admin
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_ADMIN}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-admin-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-net
+
+  mysql-paciente:
+    image: mysql:8.0
+    container_name: mysql-paciente
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_PACIENTE}
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-paciente-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-net
+
+  mysql-agenda:
+    image: mysql:8.0
+    container_name: mysql-agenda
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_AGENDA}
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql-agenda-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spring-net
+
+  agenda:
+    build:
+      context: ./agenda
+      dockerfile: Dockerfile
+    container_name: agenda-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-agenda:3306/${DB_AGENDA}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8085:8085"
+    depends_on:
+      mysql-agenda:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: admin-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-admin:3306/${DB_ADMIN}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-admin:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+  paciente:
+    build:
+      context: ./paciente
+      dockerfile: Dockerfile
+    container_name: paciente
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-paciente:3306/${DB_PACIENTE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql-paciente:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+
+  db-sonarqube:
+    image: postgres:16-alpine
+    container_name: db-sonarqube
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar_password_1234
+      POSTGRES_DB: sonar
+    volumes:
+      - sonar-db-data:/var/lib/postgresql/data
+    networks:
+      - spring-net
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    depends_on:
+      - db-sonarqube
+    environment:
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar_password_1234
+      SONAR_JDBC_URL: jdbc:postgresql://db-sonarqube:5432/sonar
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar-data:/opt/sonarqube/data
+      - sonar-extensions:/opt/sonarqube/extensions
+      - sonar-logs:/opt/sonarqube/logs
+    networks:
+      - spring-net
+
+    
+networks:
+  spring-net:
+
+volumes:
+  mysql-admin-data:
+  mysql-paciente-data:
+  mysql-agenda-data:
+  sonar-data:
+  sonar-extensions:
+  sonar-logs:
+  sonar-db-data:
+
