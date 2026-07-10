@@ -13,11 +13,14 @@ import com.clinica.agenda.entities.dto.PacienteAtendidoDTO;
 import com.clinica.agenda.enums.DiaSemana;
 import com.clinica.agenda.enums.EstadoCita;
 import com.clinica.agenda.repository.DisponibilidadDoctorRepository;
+import com.clinica.agenda.service.RabbitMQProducer;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,9 @@ public class CitaServiceImplement implements CitaService {
 
         @Autowired
         private WebClient pacienteWebClient;
+
+        @Autowired
+        private RabbitMQProducer rabbitMQProducer;
 
         @Override
         public List <Cita> listarTodos(){
@@ -54,7 +60,31 @@ public class CitaServiceImplement implements CitaService {
 
         if (paciente == null) {
                 throw new RuntimeException("Paciente no encontrado");
-        }return CitaRepo.save(cita);}
+        }
+
+        Cita citaGuardada = CitaRepo.save(cita);
+
+        // Publicar notificación de cita creada
+        try {
+                Map<String, String> notificacion = new HashMap<>();
+                notificacion.put("tipo", "CITA_CREADA");
+                notificacion.put("pacienteEmail", paciente.getEmail());
+                notificacion.put("pacienteNombre", paciente.getNombre());
+                notificacion.put("pacienteApellido", paciente.getApellido());
+                notificacion.put("doctorNombre", cita.getDoctor().getNombre());
+                notificacion.put("doctorApellido", cita.getDoctor().getApellido() != null ? cita.getDoctor().getApellido() : "");
+                notificacion.put("doctorCorreo", cita.getDoctor().getCorreo());
+                notificacion.put("fecha", cita.getFecha().toString());
+                notificacion.put("horaInicio", cita.getHoraInicio().toString());
+                notificacion.put("horaFin", cita.getHoraFin() != null ? cita.getHoraFin().toString() : "");
+                notificacion.put("estado", cita.getEstado().name());
+                rabbitMQProducer.enviarNotificacion(notificacion);
+        } catch (Exception e) {
+                System.err.println("Error al enviar notificación: " + e.getMessage());
+        }
+
+        return citaGuardada;
+        }
 
         @Override
         public List<CitaDetDTO> obtenerPorFecha(
@@ -128,7 +158,29 @@ public class CitaServiceImplement implements CitaService {
                 existente.setEstado(cita.getEstado());
                 existente.setDoctor(cita.getDoctor());
 
-                return CitaRepo.save(existente);}
+                Cita citaActualizada = CitaRepo.save(existente);
+
+                // Publicar notificación de cita actualizada
+                try {
+                        Map<String, String> notificacion = new HashMap<>();
+                        notificacion.put("tipo", "CITA_ACTUALIZADA");
+                        notificacion.put("pacienteEmail", "");
+                        notificacion.put("pacienteNombre", "");
+                        notificacion.put("pacienteApellido", "");
+                        notificacion.put("doctorNombre", citaActualizada.getDoctor().getNombre());
+                        notificacion.put("doctorApellido", citaActualizada.getDoctor().getApellido() != null ? citaActualizada.getDoctor().getApellido() : "");
+                        notificacion.put("doctorCorreo", citaActualizada.getDoctor().getCorreo());
+                        notificacion.put("fecha", citaActualizada.getFecha().toString());
+                        notificacion.put("horaInicio", citaActualizada.getHoraInicio().toString());
+                        notificacion.put("horaFin", citaActualizada.getHoraFin() != null ? citaActualizada.getHoraFin().toString() : "");
+                        notificacion.put("estado", citaActualizada.getEstado().name());
+                        rabbitMQProducer.enviarNotificacion(notificacion);
+                } catch (Exception e) {
+                        System.err.println("Error al enviar notificación: " + e.getMessage());
+                }
+
+                return citaActualizada;
+        }
 
         @Override
         public void eliminar(Long id){CitaRepo.deleteById(id);}
