@@ -1,5 +1,6 @@
 package com.clinica.agenda.entities;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +24,7 @@ public class Especialidad {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_especialidad")
     private Long id;
 
     private String nombreEsp;
