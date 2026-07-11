@@ -1,4 +1,5 @@
 services:
+  # === BASES DE DATOS ===
   mysql-admin:
     image: mysql:8.0
     container_name: mysql-admin
@@ -56,63 +57,38 @@ services:
     networks:
       - spring-net
 
-  agenda:
-    build:
-      context: ./agenda
-      dockerfile: Dockerfile
-    container_name: agenda-service
+  mysql-notificaciones:
+    image: mysql:8.0
+    container_name: mysql-notificaciones
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-agenda:3306/${DB_AGENDA}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NOTIFICACIONES}
     ports:
-      - "8085:8085"
-    depends_on:
-      mysql-agenda:
-        condition: service_healthy
+      - "3310:3306"
+    volumes:
+      - mysql-notificaciones-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - spring-net
 
-
-  admin-service:
-    build:
-      context: ./admin-service
-      dockerfile: Dockerfile
-    container_name: admin-service
+  # === INFRAESTRUCTURA ===
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-admin:3306/${DB_ADMIN}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
     ports:
-      - "8082:8082"
-    depends_on:
-      mysql-admin:
-        condition: service_healthy
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - spring-net
-
-  paciente:
-    build:
-      context: ./paciente
-      dockerfile: Dockerfile
-    container_name: paciente
-    restart: unless-stopped
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-paciente:3306/${DB_PACIENTE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "8083:8083"
-    depends_on:
-      mysql-paciente:
-        condition: service_healthy
-    networks:
-      - spring-net
-
 
   db-sonarqube:
     image: postgres:16-alpine
@@ -144,7 +120,139 @@ services:
     networks:
       - spring-net
 
-    
+  # === MICROSERVICIOS ===
+  autenticacion:
+    build:
+      context: ./autenticacion
+      dockerfile: Dockerfile
+    container_name: autenticacion-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-admin:3306/${DB_AUTH}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql-admin:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+  admin-service:
+    build:
+      context: ./admin-service
+      dockerfile: Dockerfile
+    container_name: admin-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-admin:3306/${DB_ADMIN}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql-admin:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+  paciente:
+    build:
+      context: ./paciente
+      dockerfile: Dockerfile
+    container_name: paciente-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-paciente:3306/${DB_PACIENTE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql-paciente:
+        condition: service_healthy
+    networks:
+      - spring-net
+
+  agenda:
+    build:
+      context: ./agenda
+      dockerfile: Dockerfile
+    container_name: agenda-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-agenda:3306/${DB_AGENDA}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+    ports:
+      - "8085:8085"
+    depends_on:
+      mysql-agenda:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - spring-net
+
+  notificaciones:
+    build:
+      context: ./notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-notificaciones:3306/${DB_NOTIFICACIONES}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+    ports:
+      - "8087:8087"
+    depends_on:
+      mysql-notificaciones:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - spring-net
+
+  apigateway:
+    build:
+      context: ./apigateway
+      dockerfile: Dockerfile
+    container_name: apigateway-service
+    restart: unless-stopped
+    environment:
+      AUTENTICACION_URI: http://admin-service:8082
+      ADMIN_SERVICE_URI: http://admin-service:8082
+      PACIENTE_URI: http://paciente-service:8083
+      AGENDA_URI: http://agenda-service:8085
+      NOTIFICACIONES_URI: http://notificaciones-service:8087
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+    ports:
+      - "9090:9090"
+    depends_on:
+      - admin-service
+      - paciente
+      - agenda
+      - notificaciones
+    networks:
+      - spring-net
+
 networks:
   spring-net:
 
@@ -152,8 +260,8 @@ volumes:
   mysql-admin-data:
   mysql-paciente-data:
   mysql-agenda-data:
+  mysql-notificaciones-data:
   sonar-data:
   sonar-extensions:
   sonar-logs:
   sonar-db-data:
-
